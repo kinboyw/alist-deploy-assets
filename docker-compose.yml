@@ -1,0 +1,32 @@
+version: '3.8'
+services:
+  alist:
+    image: xhofe/alist:latest
+    container_name: alist
+    restart: unless-stopped
+    volumes:
+      - /volume1/docker/alist:/opt/alist/data:rw
+      - /volume1/music:/synology/music:rw
+      - /volume1/books:/synology/books:rw
+      - /volume1/photo:/synology/photo:rw
+      - /volume1/video:/synology/video:rw
+      - /volume1/download:/synology/download:rw
+    ports:
+      - "5244:5244"
+    environment:
+      - PUID=0
+      - PGID=0
+      - UMASK=022
+
+  alist-proxy:
+    image: alist-proxy:1.0.0
+    container_name: alist-proxy
+    restart: unless-stopped
+    ports:
+      - "5243:5243"
+    environment:
+      - ALIST_ADDRESS=http://alist:5244
+      - ALIST_TOKEN={your token}
+      - ALIST_PROXY_PORT=5243
+    depends_on:
+      - alist
